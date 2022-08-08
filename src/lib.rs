@@ -16,7 +16,7 @@ use core::fmt;
 use core::mem::size_of;
 #[cfg(feature = "use_spin")]
 use core::ops::Deref;
-use core::ptr::NonNull;
+use core::ptr::{null_mut, NonNull};
 #[cfg(feature = "use_spin")]
 use spin::Mutex;
 
@@ -259,7 +259,7 @@ unsafe impl<const ORDER: usize> GlobalAlloc for LockedHeap<ORDER> {
             .lock()
             .alloc(layout)
             .ok()
-            .map_or(0 as *mut u8, |allocation| allocation.as_ptr())
+            .map_or(null_mut(), |allocation| allocation.as_ptr())
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
@@ -325,7 +325,7 @@ unsafe impl<const ORDER: usize> GlobalAlloc for LockedHeapWithRescue<ORDER> {
                 inner
                     .alloc(layout)
                     .ok()
-                    .map_or(0 as *mut u8, |allocation| allocation.as_ptr())
+                    .map_or(null_mut(), |allocation| allocation.as_ptr())
             }
         }
     }
